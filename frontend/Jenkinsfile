@@ -1,8 +1,8 @@
 pipeline {
   agent any
   environment {
-    AWS_REGION         = 'ap-northeast-2'
-    ACCOUNT_ID         = '335507813633'
+    AWS_REGION         = '' # 서비스 리전 선택
+    ACCOUNT_ID         = '' # 개인 아이디 입력
     ECR_REGISTRY       = "${ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com"
     ECR_REPO           = "${ECR_REGISTRY}/shop-frontend"
     IMG_TAG            = "${env.BUILD_NUMBER}"          // GitOps A: 태그=빌드번호
