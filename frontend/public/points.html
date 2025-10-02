@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Kolon - 포인트</title>
+  <style>
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body {
+      font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Roboto","Noto Sans KR",sans-serif;
+      background:#f5f5f5; color:#333; line-height:1.6;
+    }
+
+    /* 상단 네비 */
+    .topbar{position:sticky; top:0; z-index:50; background:#fff; border-bottom:1px solid #ececec;}
+    .topbar .bar{
+      max-width:1200px; margin:0 auto; height:56px; padding:0 16px;
+      display:flex; align-items:center; justify-content:space-between;
+    }
+    .brand{ font-weight:700; text-decoration:none; color:#111; }
+    .nav{ display:flex; align-items:center; gap:10px; }
+    .pill{
+      border:1px solid #ececec; background:#f6f2ff; height:30px; padding:0 10px; border-radius:999px;
+      display:inline-flex; align-items:center; gap:6px; text-decoration:none; color:#111; font-size:13px;
+    }
+    .badge{
+      min-width:18px; height:18px; border-radius:999px; background:#6b47d6; color:#fff;
+      display:inline-flex; align-items:center; justify-content:center; font-size:12px; padding:0 6px; margin-left:6px;
+    }
+
+    /* 두 번째 줄 */
+    .subhead{
+      max-width:1200px; margin:8px auto 0; padding:0 16px;
+      display:flex; align-items:center; gap:12px;
+    }
+    .back-pill{
+      display:inline-flex; align-items:center; justify-content:center;
+      width:40px; height:32px; border:1px solid #ececec; background:#fff; border-radius:10px;
+      text-decoration:none; color:#111; font-size:16px; line-height:1;
+    }
+    .back-pill:hover{ background:#f9f9ff; }
+    .subhead-text{ color:#6b7280; font-size:14px; }
+
+    /* 원래 header는 숨김 */
+    .header{ display:none !important; }
+
+    .container { max-width:600px; margin:0 auto; padding:20px; }
+    .user-info { background:#fff; border-radius:10px; padding:20px; margin-bottom:20px;
+      display:flex; align-items:center; gap:15px; box-shadow:0 1px 3px rgba(0,0,0,.1); }
+    .user-avatar { font-size:32px; background:#f0f0f0; padding:15px; border-radius:50%; }
+    .user-details h2 { font-size:18px; margin-bottom:5px; }
+    .user-details p { color:#666; font-size:14px; }
+
+    .points-card {
+      background:linear-gradient(135deg,#007AFF,#0056CC); color:#fff; border-radius:15px;
+      padding:30px 25px; text-align:center; margin-bottom:25px; box-shadow:0 4px 15px rgba(0,122,255,.3);
+      position:relative;
+    }
+    .points-card h3 { font-size:16px; margin-bottom:10px; opacity:.9; }
+    .points-amount { font-size:36px; font-weight:700; margin-bottom:5px; }
+    .points-note { font-size:12px; opacity:.8; line-height:1.4; }
+
+    /* 숨은 충전 버튼 */
+    #hiddenChargeBtn {
+      position:absolute; bottom:8px; right:8px; width:16px; height:16px;
+      background:rgba(255,255,255,0.1); border:1px solid rgba(255,255,255,0.2);
+      color:rgba(255,255,255,0.4); font-size:10px; cursor:pointer; border-radius:3px;
+    }
+
+    .transactions-section { background:#fff; border-radius:10px; padding:20px; box-shadow:0 1px 3px rgba(0,0,0,.1); }
+    .section-title { font-size:18px; font-weight:600; margin-bottom:15px; color:#333; }
+    .transaction-item { display:flex; justify-content:space-between; align-items:center; padding:15px 0; border-bottom:1px solid #f0f0f0; }
+    .transaction-item:last-child { border-bottom:none; }
+    .transaction-info h4 { font-size:16px; margin-bottom:3px; }
+    .transaction-date { font-size:13px; color:#666; }
+    .transaction-amount { font-size:16px; font-weight:600; }
+    .transaction-amount.positive { color:#2E7D32; }
+    .transaction-amount.negative { color:#D32F2F; }
+    .empty-state { text-align:center; padding:40px 20px; color:#666; }
+    .empty-state-icon { font-size:48px; margin-bottom:15px; opacity:.5; }
+    .loading-spinner { display:flex; justify-content:center; align-items:center; padding:40px; }
+    .spinner { width:40px; height:40px; border:4px solid #f3f3f3; border-top:4px solid #007AFF; border-radius:50%; animation:spin 1s linear infinite; }
+    @keyframes spin { to { transform:rotate(360deg) } }
+    .error-message { background:#FFE6E6; color:#D32F2F; padding:15px; border-radius:8px; margin:20px 0; text-align:center; }
+    .refresh-btn { background:#007AFF; color:#fff; border:0; padding:10px 20px; border-radius:6px; cursor:pointer; margin-top:10px; }
+  </style>
+</head>
+<body>
+
+  <!-- 상단 네비 -->
+  <header class="topbar">
+    <div class="bar">
+      <a class="brand" href="main.html" aria-label="메인으로">Kolon</a>
+      <nav class="nav">
+        <a class="pill" href="logout.html">로그아웃</a>
+        <a class="pill" href="cart.html">장바구니 <span class="badge" id="cartCount">0</span></a>
+        <a class="pill" href="mypage.html">마이페이지</a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- 두 번째 줄 -->
+  <div class="subhead">
+    <a class="back-pill" href="main.html" aria-label="메인으로">←</a>
+    <span class="subhead-text">포인트</span>
+  </div>
+
+  <!-- 원래 header (숨김) -->
+  <div class="header">
+    <button class="back-btn" onclick="goBack()">←</button>
+    <h1>포인트</h1>
+  </div>
+
+  <!-- 본문 -->
+  <div class="container">
+    <div class="user-info" id="user-info">
+      <div class="user-avatar">👤</div>
+      <div class="user-details">
+        <h2 id="user-name">사용자</h2>
+        <p>내 계정 관리</p>
+      </div>
+    </div>
+
+    <div class="points-card">
+      <h3>잔여 포인트</h3>
+      <div class="points-amount" id="points-amount">0 P</div>
+      <div class="points-note">※ 포인트</div>
+      <!-- 숨겨진 충전 버튼 -->
+      <button id="hiddenChargeBtn" title="시연용 포인트 충전">+</button>
+    </div>
+
+    <div class="transactions-section">
+      <h3 class="section-title">포인트 </h3>
+      <div id="loading-spinner" class="loading-spinner" style="display:none;"><div class="spinner"></div></div>
+      <div id="error-container" class="error-message" style="display:none;">
+        <div id="error-message"></div>
+        <button class="refresh-btn" onclick="loadUserPoints()">다시 시도</button>
+      </div>
+      <div id="transactions-list"></div>
+    </div>
+  </div>
+
+  <!-- 장바구니 뱃지 -->
+  <script>
+    (function(){
+      try{
+        const CART_KEY='cart';
+        const getCart=()=>{ try{return JSON.parse(localStorage.getItem(CART_KEY))||[]}catch(e){return[]} };
+        const n=getCart().reduce((s,i)=>s+(+i.qty||0),0);
+        const b=document.getElementById('cartCount'); if(b) b.textContent=n;
+      }catch(e){}
+    })();
+  </script>
+
+  <!-- 기능 스크립트 -->
+  <script>
+    let currentUser = { id:'demo', name:'사용자', token:'demo-token' };
+
+    // 포인트 충전
+    async function addDemoPoints() {
+      try {
+        const response = await fetch('/api/demo/points/add',{method:'POST',headers:{'Content-Type':'application/json'}});
+        const data = await response.json();
+        if (response.ok) {
+          alert(`포인트 충전 완료!\n충전 금액: ${data.added_amount.toLocaleString()}P\n새 잔액: ${data.new_balance.toLocaleString()}P`);
+          loadUserPoints();
+        } else {
+          alert('포인트 충전 실패: ' + data.error);
+        }
+      } catch (err) {
+        alert('포인트 충전 중 오류 발생');
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+      loadUserPoints();
+      // 충전 버튼 연결
+      setTimeout(()=>{
+        const btn=document.getElementById('hiddenChargeBtn');
+        if(btn) btn.addEventListener('click',addDemoPoints);
+      },500);
+    });
+
+    async function loadUserPoints() {
+      const loadingSpinner = document.getElementById('loading-spinner');
+      const errorContainer = document.getElementById('error-container');
+      const transactionsList = document.getElementById('transactions-list');
+      const pointsAmount = document.getElementById('points-amount');
+
+      try {
+        loadingSpinner.style.display = 'flex';
+        errorContainer.style.display = 'none';
+        transactionsList.innerHTML = '';
+
+        const pointsResponse = await fetch('/api/demo/points');
+        const pointsData = await pointsResponse.json();
+
+        if (pointsResponse.ok) {
+          pointsAmount.textContent = `${pointsData.points_balance.toLocaleString()} P`;
+          document.getElementById('user-name').textContent = '사용자';
+        } else {
+          pointsAmount.textContent = '0 P';
+        }
+
+        try {
+          const response = await fetch(`/api/account/points?user_id=${currentUser.id}`, {
+            headers: { 'Authorization': `Bearer ${currentUser.token}`, 'Content-Type': 'application/json' }
+          });
+          if (response.ok) {
+            const data = await response.json();
+            renderTransactions(data.transactions || []);
+          } else {
+            renderTransactions([]);
+          }
+        } catch (e) {
+          renderTransactions([]);
+        }
+
+      } catch (error) {
+        showError(error.message || 'Failed to fetch');
+      } finally {
+        loadingSpinner.style.display = 'none';
+      }
+    }
+
+    function renderTransactions(transactions) {
+      const el = document.getElementById('transactions-list');
+      if (!transactions || transactions.length===0) {
+        el.innerHTML = `<div class="empty-state"><div class="empty-state-icon">📝</div></div>`;
+        return;
+      }
+      el.innerHTML = transactions.map(t=>{
+        const date = new Date(t.created_at).toLocaleDateString('ko-KR',{year:'numeric',month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'});
+        const amountClass = t.delta>0 ? 'positive' : 'negative';
+        const amountText  = t.delta>0 ? `+${t.delta.toLocaleString()}P` : `${t.delta.toLocaleString()}P`;
+        return `
+          <div class="transaction-item">
+            <div class="transaction-info">
+              <h4>${t.reason}</h4>
+              ${t.note ? `<p class="transaction-note">${t.note}</p>`:''}
+              <div class="transaction-date">${date}</div>
+            </div>
+            <div class="transaction-amount ${amountClass}">${amountText}</div>
+          </div>`;
+      }).join('');
+    }
+
+    function showError(msg) {
+      const box = document.getElementById('error-container');
+      const m = document.getElementById('error-message');
+      m.textContent = msg;
+      box.style.display = 'block';
+    }
+
+    function goBack(){
+      if (document.referrer) history.back();
+      else location.href='main.html';
+    }
+
+    // 자동 새로고침
+    setInterval(()=>{
+      if(currentUser && document.visibilityState==='visible'){
+        loadUserPoints();
+      }
+    },30000);
+  </script>
+</body>
+</html>
+
