@@ -1,8 +1,8 @@
 pipeline {
   agent any
   environment {
-    AWS_REGION         = 'ap-northeast-2'
-    ACCOUNT_ID         = '335507813633'
+    AWS_REGION         = '' #서비스 리전입력
+    ACCOUNT_ID         = '' # 개인 ID 입력
     // 전체 경로 그대로 유지 (sed, push에서 사용)
     ECR_REPO           = "${ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/shop-backend"
     IMG_TAG            = "${env.BUILD_NUMBER}"
